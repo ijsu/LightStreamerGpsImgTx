@@ -1,0 +1,69 @@
+<html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript" src="loadxmldoc.js"></script>
+<script type="text/javascript">
+xmlDoc=loadXMLDoc("./imgxml/recorded.xml");
+waypoints=xmlDoc.getElementsByTagName("waypoint");
+
+var s;
+var i=0;
+function showmap(lat, lon, dtime) {
+	var myLatlng = new google.maps.LatLng(parseFloat(lat),parseFloat(lon));
+	var myOptions = {
+	  zoom: 15,
+	  center: myLatlng,
+	  mapTypeId: google.maps.MapTypeId.ROADMAP };
+	var map = new google.maps.Map(document.getElementById('mapshow'), myOptions);
+	var marker = new google.maps.Marker({
+		position: myLatlng, 
+		map: map,
+		title: dtime });   
+}
+
+function read_show() 
+{
+ if (i <= waypoints.length-1)
+	{
+	  x = waypoints[i].attributes;
+	  lat = x.getNamedItem("latitude").nodeValue;
+	  lon = x.getNamedItem("longitude").nodeValue;
+	  dtime = x.getNamedItem("time").nodeValue;
+
+	   var dateDiv = document.getElementById("date");
+	   var datestr = (new Date(parseInt(dtime))).toLocaleString();
+	   dateDiv.innerHTML = datestr;  
+	   var latDiv = document.getElementById("latitude");  
+	   latDiv.innerHTML = lat;  
+	   var lonDiv = document.getElementById("longitude");  
+	   lonDiv.innerHTML = lon;
+	   
+	   showmap(lat, lon, datestr);
+	   document.getElementById('imgshow').src = "./imgxml/" + dtime + ".png";
+	  i=i+1;
+      s=setTimeout("read_show()",5000); 
+	}
+}
+
+</script>
+
+<title>Automatic Show Map</title>
+</head>
+
+<body onLoad="read_show()">
+    <center>
+      <table>
+        <tr><td><div id="mapshow" style="width:360; height:360"></div></td>
+			<td><img src="" id="imgshow" width="360" height="360"></td></tr>
+      </table>
+	  <table id="tickerTable">  
+		<tr><th align="left" width="100">時間位置</th><th align="left" width="100">值</th></tr>  
+		<tr><td>時間</td><td id="date">-</td></tr>  
+		<tr><td>經度</td><td id="latitude">-</td></tr>  
+		<tr><td>緯度</td><td id="longitude">-</td></tr>  
+	  </table>
+    </center>
+</body>
+</html>
