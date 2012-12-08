@@ -1,0 +1,1 @@
+set CLASSPATH=.;.\jdom.jar;..\..\Lightstreamer\DOCS-SDKs\sdk_adapter_java\lib\ls-adapter-interface.jar

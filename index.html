@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>  
+    <title>Live Monitoring</title>  
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/1.0.7/require.min.js"></script>
+    <script src="lightstreamer.js"></script>
+</head>  
+<body>  
+<h1>Live Monitoring</h1>  
+  
+    <center>
+		  
+      <table>
+        <tr><td><img src="" id="mapshow" width="360" height="360"></td></td>
+			<td><img src="" id="imgshow" width="360" height="360"></td></tr>
+      </table>
+	  
+	  <table id="tickerTable">  
+		<tr><th align="left" width="100">時間位置</th><th align="left" width="100">值</th></tr>  
+		<tr><td>時間</td><td id="date">-</td></tr>  
+		<tr><td>經度</td><td id="latitude">-</td></tr>  
+		<tr><td>緯度</td><td id="longitude">-</td></tr>  
+		<tr><td>高度</td><td id="altitude">-</td></tr>  
+	  </table>
+	  
+    </center>
+   
+    <script>
+      require(["LightstreamerClient","Subscription"],function(LightstreamerClient,Subscription) {
+	  var myClient = new LightstreamerClient(null,"GpsImgTx");
+        myClient.connect();
+                
+        var mySubscription = new Subscription("MERGE",["gpsparameters"],["gpstime","latitude","longitude","altitude"]);
+        mySubscription.addListener({
+			onItemUpdate: function(updateObject) {
+				var dateDiv = document.getElementById("date");  
+					dateiv.innerHTML = (new Date(parseInt(updateObject.getValue("gpstime")))).toLocaleString();  
+				var latDiv = document.getElementById("latitude");  
+					latDiv.innerHTML = updateObject.getValue("latitude");  
+				var lonDiv = document.getElementById("longitude");  
+					lonDiv.innerHTML = updateObject.getValue("longitude");  
+				var altDiv = document.getElementById("altitude");  
+					altDiv.innerHTML = updateObject.getValue("altitude");
+				zoomsize = "&zoom=" + "14" + "&size=" + "360x360";
+				key = "&key=ABQIAAAABPwouWYj3VnD5GFB6ruqxxRQKVdcuJ1PIKoX_YH_iOiTmZiR8BR__D2FH9CJzfKzbgyDU3EOrVPL8w";
+				if ((updateObject.getValue("latitude")=="0.0")||(updateObject.getValue("longitude")=="0.0"))
+						document.getElementById('mapshow').src = "";
+				else {
+						marker = "&markers=" + updateObject.getValue("latitude") +"," + updateObject.getValue("longitude") + ",red"; 
+						urlpath = "http:\/\/maps.google.com\/staticmap?center=" + updateObject.getValue("latitude") + "'" + updateObject.getValue("longitude" ;
+						document.getElementById('mapshow').src = urlpath.concat(marker,zoomsize,key); 
+				}
+				document.getElementById('imgshow').src = "http://localhost:8080/GpsImgTx/imgxml/" + oData.date + ".png"; 
+
+		    }
+        });
+        myClient.subscribe(mySubscription);
+      });
+    </script>
+
+</body>  
+</html>
